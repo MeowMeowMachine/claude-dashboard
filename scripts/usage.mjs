@@ -170,6 +170,8 @@ function tool(b) {
   const i = b.input || {}, n = b.name.replace(/^mcp__[^_]+(?:_[^_]+)*?__/, '')
   return clip(`${n}: ${i.description || i.command || (i.file_path && path.basename(i.file_path)) || i.pattern || i.prompt || i.query || i.title || ''}`)
 }
+const OFFER = /^\W*(want|should i|shall i|do you want|would you like|soll ich|willst du|möchtest du)\b/i
+
 function activity(file) {
   let text = ''
   try {
@@ -193,7 +195,8 @@ function activity(file) {
     const blocks = (r.message?.content || []).filter(b => b.type === 'tool_use' || b.type === 'text')
     if (!blocks.length) continue
     const b = blocks[blocks.length - 1]
-    if (b.type === 'text') return { ask: /\?\s*$/.test(b.text), doing: clip(b.text) }
+    // a closing offer ("Want me to…?") is optional, not a question the session waits on
+    if (b.type === 'text') return { ask: /\?\s*$/.test(b.text) && !OFFER.test(b.text.trim().split(/[.!:\n]\s+/).pop()), doing: clip(b.text) }
     if (ASKS.has(b.name)) return { ask: true, doing: clip(b.input?.questions?.[0]?.question || 'plan ready for approval') }
     if (b.name.endsWith('wrap_up')) return b.input?.ask ? { ask: true, doing: clip(b.input.ask) } : { ask: false, doing: clip(b.input?.recap) }
     return { ask: false, doing: tool(b) }
