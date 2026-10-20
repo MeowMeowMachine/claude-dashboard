@@ -1,0 +1,1 @@
+{ "name": "usage-dashboard", "version": "0.1.0", "description": "Token usage chart and active Claude sessions, shown at session start", "types": "./types/index.d.ts" }
