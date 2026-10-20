@@ -23,14 +23,28 @@ All data comes from local files in `~/.claude` (transcripts, session files). Not
    git clone https://github.com/MeowMeowMachine/claude-dashboard.git ~/.claude/mods/usage-dashboard
    ```
 
-2. Start a new Claude Code session. On `session.start` the mod:
+2. Tell Claude Code to load the mod. Cloning alone does nothing: add the folder to `CLAUDE_CODE_PLUGIN_DIRS` in the `env` block of `~/.claude/settings.json`. Use the absolute path with forward slashes (`~` is not expanded here):
+
+   ```json
+   {
+     "env": {
+       "CLAUDE_CODE_PLUGIN_DIRS": "C:/Users/<you>/.claude/mods/usage-dashboard"
+     }
+   }
+   ```
+
+   If `settings.json` already has an `env` block, add the key to it; do not add a second `env`. On macOS/Linux use e.g. `/home/<you>/.claude/mods/usage-dashboard`.
+
+3. Optional check: `claude plugin validate ~/.claude/mods/usage-dashboard` should end with "Validation passed" (warnings about a missing author are fine).
+
+4. Fully restart Claude Code (close the desktop app or every `claude` terminal), so it picks up the setting, then start a new session. On `session.start` the mod:
    - registers the `/dashboard` command,
    - starts the web server (hidden, detached; a second start exits when port 8765 is taken),
    - opens the **Usage** pane and refreshes the data.
 
-   Claude Code generates the mod SDK types into `.claude-plugin/types/` itself; they are not in the repo.
+   Claude Code writes the mod SDK types into `.claude-plugin/types/` the first time it loads the mod. They are not in the repo, so an editor may show type errors in `hooks/` until then.
 
-3. Open the dashboard:
+5. Open the dashboard:
    - `/dashboard` - show it in the pane
    - `/dashboard tab` - open it in your default browser
    - `/dashboard app` - open it in Claude's in-app browser pane
